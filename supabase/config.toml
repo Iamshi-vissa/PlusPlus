@@ -1,0 +1,52 @@
+# Local Supabase config.
+#   pnpm supabase start      # starts the local stack (needs Docker)
+#   pnpm supabase db reset   # applies migrations + seed
+#   pnpm supabase test db    # runs the database (RLS) tests in supabase/tests
+project_id = "plusplus"
+
+[api]
+port = 54321
+
+[db]
+port = 54322
+major_version = 17
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed/*.sql"]
+
+[auth]
+enabled = true
+site_url = "plusplus://"
+# Sign-in is by phone number + one-time code (OTP) only.
+enable_signup = true
+
+[auth.email]
+enabled = false
+
+[auth.sms]
+enabled = true
+enable_confirmations = true
+max_frequency = "60s"
+template = "Your plusplus code is {{ .Code }}"
+
+# LOCAL DEVELOPMENT ONLY: these numbers skip the SMS and always accept the code 123456.
+# Production sends real SMS through MSG91 via a "Send SMS" auth hook (see PROJECT.md).
+[auth.sms.test_otp]
+919999900001 = "123456"
+919999900002 = "123456"
+919999900003 = "123456"
+919999900004 = "123456"
+919999900005 = "123456"
+
+# Supabase needs some SMS provider configured before it accepts phone sign-ins.
+# Locally only the test numbers above are used, so nothing is actually sent.
+[auth.sms.twilio]
+enabled = true
+account_sid = "local-dev-not-used"
+message_service_sid = "local-dev-not-used"
+auth_token = "local-dev-not-used"
+
+[storage]
+enabled = true
+file_size_limit = "10MiB"

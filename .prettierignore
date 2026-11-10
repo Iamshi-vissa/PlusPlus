@@ -1,0 +1,15 @@
+node_modules
+.expo
+dist
+coverage
+pnpm-lock.yaml
+android
+ios
+expo-env.d.ts
+PROJECT.md
+src/lib/geo/karnataka-check.json
+supabase/migrations/20261112000001_karnataka_geo_data.sql
+admin/.next
+admin/node_modules
+admin/next-env.d.ts
+admin/pnpm-lock.yaml

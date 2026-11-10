@@ -1,0 +1,141 @@
+:root {
+  --bg: #fff;
+  --surface: #f3f5f7;
+  --text: #111827;
+  --muted: #4b5563;
+  --primary: #0b6e4f;
+  --danger: #c81e1e;
+  --border: #d1d5db;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Noto Sans Kannada',
+    sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+header strong {
+  color: var(--primary);
+  font-size: 20px;
+  margin-right: 12px;
+}
+header a {
+  color: var(--text);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+header a:hover {
+  background: var(--surface);
+}
+main {
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.narrow {
+  max-width: 420px;
+  margin: 40px auto;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.stat {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.stat.warn {
+  color: var(--danger);
+}
+label {
+  display: block;
+  font-weight: 600;
+  margin: 8px 0;
+}
+input,
+textarea,
+select {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  margin-top: 4px;
+}
+button {
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 4px 8px 4px 0;
+}
+button.secondary {
+  background: #fff;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+button.danger {
+  background: #fff;
+  color: var(--danger);
+  border: 2px solid var(--danger);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.muted {
+  color: var(--muted);
+}
+.error {
+  color: var(--danger);
+  font-weight: 600;
+}
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 13px;
+}
+.docs a {
+  margin-right: 12px;
+}
