@@ -1,0 +1,46 @@
+{
+  "app": {
+    "name": "plusplus",
+    "tagline": "Care and emergency help, across Karnataka"
+  },
+  "tabs": {
+    "home": "Home",
+    "explore": "Find care",
+    "appointments": "Appointments",
+    "profile": "Profile"
+  },
+  "home": {
+    "sos": "SOS",
+    "sosHint": "Tap in an emergency",
+    "sosComingSoon": "SOS alerts to nearby volunteer drivers are coming soon. For now, call 108 or 112.",
+    "findCare": "Find hospitals, clinics and medical stores",
+    "findDoctor": "Find a doctor for my problem"
+  },
+  "emergency": {
+    "call108": "Call 108",
+    "call108Hint": "Ambulance",
+    "call112": "Call 112",
+    "call112Hint": "Emergency helpline",
+    "callFailed": "Could not open the phone dialler. Please dial {{number}} yourself."
+  },
+  "explore": {
+    "title": "Find care nearby",
+    "comingSoon": "Hospitals, clinics and medical stores near you will appear here."
+  },
+  "appointments": {
+    "title": "Your appointments",
+    "comingSoon": "Appointments you book will appear here."
+  },
+  "profile": {
+    "title": "Profile",
+    "language": "Language",
+    "comingSoon": "Sign-in, emergency contacts and your medical profile will appear here."
+  },
+  "language": {
+    "en": "English",
+    "kn": "ಕನ್ನಡ"
+  },
+  "geo": {
+    "outsideKarnataka": "plusplus is currently available only in Karnataka."
+  }
+}

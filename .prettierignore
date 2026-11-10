@@ -1,0 +1,9 @@
+node_modules
+.expo
+dist
+coverage
+pnpm-lock.yaml
+android
+ios
+expo-env.d.ts
+CLAUDE.md

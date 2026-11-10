@@ -1,0 +1,15 @@
+# Local Supabase config. Run `supabase start` (needs Docker) then `supabase db reset`.
+project_id = "plusplus"
+
+[db]
+major_version = 17
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed/*.sql"]
+
+[auth]
+enabled = true
+site_url = "plusplus://"
+
+# Phone OTP login is switched on in phase 2 (needs an SMS provider).
