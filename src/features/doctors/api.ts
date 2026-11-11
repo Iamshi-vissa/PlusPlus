@@ -233,3 +233,23 @@ export async function submitReview(
   });
   return !error;
 }
+
+export type ProblemSuggestion = { emergency: boolean; problemCodes: string[] };
+
+/**
+ * Matches the user's own words to problem codes (Edge Function `suggest-problems`).
+ * Returns null when the matcher is unavailable (not set up, offline, rate limited) so the
+ * search simply carries on without it.
+ */
+export async function suggestProblems(text: string): Promise<ProblemSuggestion | null> {
+  try {
+    const { data, error } = await getSupabase().functions.invoke<ProblemSuggestion>(
+      'suggest-problems',
+      { body: { text } },
+    );
+    if (error || !data || !Array.isArray(data.problemCodes)) return null;
+    return { emergency: data.emergency === true, problemCodes: data.problemCodes };
+  } catch {
+    return null;
+  }
+}

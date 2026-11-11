@@ -343,7 +343,11 @@
       "kok": "Konkani"
     },
     "locating": "Finding doctors near you…",
-    "locationNeeded": "We need your location to find doctors near you."
+    "locationNeeded": "We need your location to find doctors near you.",
+    "matching": "Matching your words…",
+    "matched": "From what you wrote, we picked: {{problems}}",
+    "matchedHint": "This only helps find the right doctor. It is not a diagnosis.",
+    "matchedChange": "Change"
   },
   "emergencyScreen": {
     "title": "This may be an emergency",

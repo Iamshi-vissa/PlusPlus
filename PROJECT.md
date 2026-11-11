@@ -169,7 +169,7 @@ One person can hold more than one role (for example, a user who is also a respon
 | Feature | Approach | When |
 |---|---|---|
 | Problem picker (list + body-area) → speciality | **No AI needed.** A curated `problem → speciality` table reviewed by a doctor. Predictable, works offline, easy to audit. | v1 |
-| Free-text "type your problem" → speciality (e.g. "knee pain when climbing stairs" → orthopaedic) | A small, fast LLM called from an Edge Function, returning only a speciality from a fixed list. **Never gives medical advice or a diagnosis.** If the text mentions red-flag words (chest pain, can't breathe, unconscious, heavy bleeding, stroke signs), skip the AI and show "Call 108 / raise SOS" immediately. | Phase 9+ |
+| Free-text "type your problem" → speciality (e.g. "knee pain when climbing stairs" → orthopaedic) | A small, fast LLM called from an Edge Function, returning only a speciality from a fixed list. **Never gives medical advice or a diagnosis.** If the text mentions red-flag words (chest pain, can't breathe, unconscious, heavy bleeding, stroke signs), skip the AI and show "Call 108 / raise SOS" immediately. | Done (`suggest-problems`) |
 | Automatic crash detection (phone detects a crash and offers SOS) | Start **rule-based**: accelerometer spike above ~4 g AND GPS speed drops from above 25 km/h to about 0 within 3 seconds → show "Are you OK?" with a 30-second countdown before raising SOS. Later, train a small on-device model (TensorFlow Lite) on real sensor data to reduce false alarms. | v2 |
 | Better ETA prediction | Not needed; the routing API's traffic-aware ETA is good enough. | — |
 
@@ -521,6 +521,7 @@ Local phone sign-in uses test numbers from `supabase/config.toml` (+91 99999 000
 - **SOS timer:** the SOS migration schedules `sos_tick()` every 5 s with pg_cron. Check with `select * from cron.job;`.
 - **Notification sender:** deploy `supabase functions deploy send-notifications`, set its secrets (see the file header), then call it every ~10 s, e.g. with pg_cron + pg_net:
   `select cron.schedule('plusplus-send', '10 seconds', $$ select net.http_post('https://<project>.functions.supabase.co/send-notifications', '{}'::jsonb, headers := jsonb_build_object('Authorization', 'Bearer <service role key>')) $$);`
+- **"Describe your problem" matcher:** `supabase functions deploy suggest-problems`, then set the secret `ANTHROPIC_API_KEY` (Supabase → Edge Functions → Secrets; optional `SUGGEST_MODEL`, default `claude-haiku-5-5`). Without the key the app skips the matching and searches as before. It picks only codes from the `problems` table (so specialities still come from the reviewed mapping), flags emergencies, never stores the text, and allows 20 calls per user per hour (`ai_suggest_allow()`).
 - **Places data:** `pnpm import:osm`, then load `supabase/.temp/osm_places.sql` with psql (service role).
 
 ## Build plan (work through in order)
@@ -537,6 +538,7 @@ Do one phase at a time. At the end of each phase: tests pass, lint is clean, and
 8. **Admin panel** — Next.js web app for verifying clinics and responders and handling reports. *(Done: `admin/` (Next.js, run with `cd admin && pnpm install && pnpm dev`, port 3001). Sign-in is by phone OTP; access needs a row in `platform_admins`. Every admin action is an `admin_*` / `review_*` SQL function that checks `is_platform_admin()`; documents open through 5-minute signed URLs. English only for now (internal tool).)*
 9. **Hardening** — rate limits, abuse reports, data deletion, offline handling (SOS must still show 108/112 buttons with no internet), crash reporting, performance on low-end Android phones. *(Done in code: rate limits (SOS 3/h, reports 10/day, 5 upcoming bookings, OTP resend 60 s), reports + fake-SOS warning → 90-day suspension, `export_my_data()` / `delete_my_account()` (refused during an active SOS), daily `purge_old_data()` (location trails after 90 days, SOS point blurred to ~1 km, old notifications and links), admin audit log, offline banner, crash screen with 108/112, privacy notice and consent line. Still to do before launch: plug in a crash-reporting service (hook in `CrashScreen`), a worker that empties `storage_deletions`, and testing on low-end Android phones.)*
 10. **Pilot launch** — one city (Bengaluru), a small group of verified responders, then expand district by district. *(Checklist: `docs/LAUNCH_CHECKLIST.md`. How to try everything locally: `docs/HOW_TO_TRY.md`.)*
+11. **"Describe your problem" matcher** *(done)* — when the user only types their problem, the Edge Function `suggest-problems` matches the words (English, Kannada or a mix) to problems from our list and the app shows "From what you wrote, we picked: …" with a Change button. Red-flag words are still checked on the phone first; if the matcher sees an emergency, the emergency screen opens. Tests: `tests/aiSuggest.test.tsx`, `supabase/tests/database/ai_suggest.test.sql`.
 
 ---
 

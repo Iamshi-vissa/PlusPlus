@@ -15,6 +15,9 @@ items marked ⚠️ are done. Tick them off in order.
 - [ ] **Google Maps** key (Android, restricted to the app's package + signing fingerprint) and
       server-side **Places / Routes** keys (Supabase secrets only).
 - [ ] **Masked calling** (Exotel or similar) — until then the SOS screens say calls are not set up.
+- [ ] **Problem matcher**: deploy `suggest-problems` and set `ANTHROPIC_API_KEY` as a Supabase secret
+      (never in Vercel or the app). Have the doctor reviewing the problem list also try ~30 real
+      descriptions in English and Kannada.
 - [ ] Crash reporting (e.g. Sentry) wired into `src/components/CrashScreen.tsx`, with no personal data.
 
 ## 2. Reviews by experts (owner: you)
