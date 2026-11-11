@@ -7,7 +7,12 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { suggestDoctorType } from '@/dispatch/suggestDoctorType';
-import { listProblems, listSpecialities, type Speciality } from '@/features/doctors/api';
+import {
+  listProblems,
+  listSpecialities,
+  type Speciality,
+  suggestProblems,
+} from '@/features/doctors/api';
 import { checkRedFlags } from '@/features/doctors/redFlags';
 import {
   resetDoctorSearch,
@@ -53,6 +58,8 @@ export default function FindDoctorScreen() {
   const [problems, setProblems] = useState<Problem[] | null>(null);
   const [specialities, setSpecialities] = useState<Speciality[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [matching, setMatching] = useState(false);
+  const [matched, setMatched] = useState<Problem[]>([]);
   const kn = i18n.language === 'kn';
 
   useEffect(() => {
@@ -82,13 +89,32 @@ export default function FindDoctorScreen() {
     return false;
   };
 
-  const next1 = () => {
+  const next1 = async () => {
     if (picked.length === 0 && !search.description.trim()) {
       setError(t('doctors.needProblem'));
       return;
     }
     setError(null);
-    if (!goEmergencyIfNeeded()) setStep(2);
+    if (goEmergencyIfNeeded()) return;
+    setMatched([]);
+    // Only typed words and nothing picked: match the words to problems from our list.
+    if (picked.length === 0 && problems) {
+      setMatching(true);
+      const result = await suggestProblems(search.description);
+      setMatching(false);
+      if (result?.emergency) {
+        router.push({ pathname: '/doctor/emergency', params: { reasons: 'described' } });
+        return;
+      }
+      const found = (result?.problemCodes ?? [])
+        .map((code) => problems.find((p) => p.code === code))
+        .filter((p): p is Problem => p !== undefined);
+      if (found.length > 0) {
+        setDoctorSearch({ problems: found });
+        setMatched(found);
+      }
+    }
+    setStep(2);
   };
   const next2 = () => {
     const a = search.answers;
@@ -217,7 +243,12 @@ export default function FindDoctorScreen() {
               {error}
             </Text>
           ) : null}
-          <Button label={t('doctors.next')} onPress={next1} testID="next-1" />
+          <Button
+            label={matching ? t('doctors.matching') : t('doctors.next')}
+            onPress={() => void next1()}
+            loading={matching}
+            testID="next-1"
+          />
         </>
       ) : null}
 
@@ -226,6 +257,22 @@ export default function FindDoctorScreen() {
           <Text style={styles.h1} accessibilityRole="header">
             {t('doctors.step2')}
           </Text>
+          {matched.length > 0 ? (
+            <View style={styles.matched} testID="matched">
+              <Text style={styles.suggestion}>
+                {t('doctors.matched', { problems: matched.map(name).join(', ') })}
+              </Text>
+              <Text style={styles.muted}>{t('doctors.matchedHint')}</Text>
+              <Button
+                variant="secondary"
+                label={t('doctors.matchedChange')}
+                onPress={() => {
+                  setMatched([]);
+                  setStep(1);
+                }}
+              />
+            </View>
+          ) : null}
           <Question<Duration>
             title={t('doctors.duration.q')}
             options={['today', 'few_days', 'weeks']}
@@ -448,4 +495,11 @@ const styles = StyleSheet.create({
   optionTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
   suggestion: { fontSize: 16, color: colors.primary, fontWeight: '600' },
   note: { fontSize: 15, color: colors.textMuted, fontStyle: 'italic' },
+  matched: {
+    gap: spacing.sm,
+    padding: spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
 });
